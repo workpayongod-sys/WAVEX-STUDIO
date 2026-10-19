@@ -1,5 +1,7 @@
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let ctx = null;
+let masterGain = null;
+let masterCompressor = null;
 let isPlaying = false;
 let currentStep = 0;
 let intervalId = null;
@@ -14,8 +16,27 @@ const tracks = [
 
 const sequence = tracks.map(() => Array(8).fill(false));
 
+// Initialize Master Audio Chain with Master Limiter & Compressor
 function initCtx() {
-  if (!ctx) ctx = new AudioCtx();
+  if (!ctx) {
+    ctx = new AudioCtx();
+
+    // Studio Master Gain
+    masterGain = ctx.createGain();
+    masterGain.gain.value = parseFloat(document.getElementById('volInput').value);
+
+    // Studio Master Compressor / Limiter (Prevents clipping distortion)
+    masterCompressor = ctx.createDynamicsCompressor();
+    masterCompressor.threshold.setValueAtTime(-12, ctx.currentTime);
+    masterCompressor.knee.setValueAtTime(30, ctx.currentTime);
+    masterCompressor.ratio.setValueAtTime(12, ctx.currentTime);
+    masterCompressor.attack.setValueAtTime(0.003, ctx.currentTime);
+    masterCompressor.release.setValueAtTime(0.25, ctx.currentTime);
+
+    // Audio Routing: Instruments -> Master Gain -> Master Compressor -> Speakers
+    masterGain.connect(masterCompressor);
+    masterCompressor.connect(ctx.destination);
+  }
   if (ctx.state === 'suspended') ctx.resume();
 }
 
@@ -30,59 +51,68 @@ function switchView(viewName) {
   renderViewport();
 }
 
+// Studio Grade Audio DSP Engine
 function playSound(type) {
   if (!ctx) return;
-  const masterVol = parseFloat(document.getElementById('volInput').value);
   const now = ctx.currentTime;
 
   if (type === 'kick') {
+    // Punchy Sub-Kick
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
-    gain.gain.setValueAtTime(masterVol, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.15);
+
+    gain.gain.setValueAtTime(1.0, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(masterGain);
+
     osc.start(now);
-    osc.stop(now + 0.25);
+    osc.stop(now + 0.3);
   } 
   else if (type === 'snare') {
-    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+    // Body + Snare Noise Snap
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
     const output = noiseBuffer.getChannelData(0);
     for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
+    
     const whiteNoise = ctx.createBufferSource();
     whiteNoise.buffer = noiseBuffer;
 
     const noiseFilter = ctx.createBiquadFilter();
     noiseFilter.type = 'highpass';
-    noiseFilter.frequency.value = 800;
+    noiseFilter.frequency.value = 1000;
 
     const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(masterVol * 0.8, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    noiseGain.gain.setValueAtTime(0.8, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
 
     whiteNoise.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
+    noiseGain.connect(masterGain);
 
     const osc = ctx.createOscillator();
     const oscGain = ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(180, now);
-    osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
-    oscGain.gain.setValueAtTime(masterVol, now);
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+    oscGain.gain.setValueAtTime(0.7, now);
     oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
 
     osc.connect(oscGain);
-    oscGain.connect(ctx.destination);
+    oscGain.connect(masterGain);
 
     whiteNoise.start(now);
     osc.start(now);
-    whiteNoise.stop(now + 0.15);
+    whiteNoise.stop(now + 0.18);
     osc.stop(now + 0.1);
   } 
   else if (type === 'hat') {
+    // Crisp High-Pass Hat
     const bufferSize = ctx.sampleRate * 0.05;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -93,19 +123,20 @@ function playSound(type) {
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'highpass';
-    filter.frequency.value = 8000;
+    filter.frequency.value = 7000;
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(masterVol * 0.6, now);
+    gain.gain.setValueAtTime(0.5, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
 
     source.connect(filter);
     filter.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(masterGain);
     source.start(now);
   } 
   else if (type === 'clap') {
-    const bufferSize = ctx.sampleRate * 0.12;
+    // Crisp Room Echo Clap
+    const bufferSize = ctx.sampleRate * 0.15;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
@@ -115,15 +146,15 @@ function playSound(type) {
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.frequency.value = 1200;
+    filter.frequency.value = 1500;
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(masterVol, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+    gain.gain.setValueAtTime(0.8, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
 
     source.connect(filter);
     filter.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(masterGain);
     source.start(now);
   }
 }
@@ -133,16 +164,15 @@ function playPianoFreq(freq) {
   if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  const masterVol = parseFloat(document.getElementById('volInput').value);
 
   osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
-  gain.gain.setValueAtTime(masterVol * 0.7, ctx.currentTime);
+  gain.gain.setValueAtTime(0.5, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
 
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(masterGain);
 
   osc.start();
   osc.stop(ctx.currentTime + 0.4);
@@ -150,17 +180,17 @@ function playPianoFreq(freq) {
 
 function renderViewport() {
   const viewport = document.getElementById('viewport');
+  if (!viewport) return;
   viewport.innerHTML = '';
 
   if (currentView === 'rack') {
-    let html = `
+    viewport.innerHTML = `
       <div class="flex justify-between items-center mb-2 px-1">
         <span class="text-[10px] font-black tracking-widest text-zinc-400">CHANNEL RACK</span>
         <span class="text-[9px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">8 STEPS</span>
       </div>
       <div id="rack-container" class="space-y-2"></div>
     `;
-    viewport.innerHTML = html;
     renderRack();
   } 
   else if (currentView === 'piano') {
@@ -302,6 +332,13 @@ function renderRack() {
   });
 }
 
+// Master Volume Listener
+document.getElementById('volInput').oninput = (e) => {
+  if (masterGain) {
+    masterGain.gain.setValueAtTime(parseFloat(e.target.value), ctx.currentTime);
+  }
+};
+
 document.getElementById('playBtn').onclick = () => {
   initCtx();
   isPlaying = !isPlaying;
@@ -309,7 +346,7 @@ document.getElementById('playBtn').onclick = () => {
 
   if (isPlaying) {
     playBtn.innerText = '■ STOP';
-    playBtn.className = 'bg-rose-500 hover:bg-rose-600 text-white font-black text-xs px-5 py-2 rounded-lg shadow-lg shadow-rose-500/20 active:scale-95 transition';
+    playBtn.className = 'bg-rose-500 hover:bg-rose-600 text-white font-black text-xs px-5 py-2 rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 transition';
     currentStep = 0;
     runSequencer();
   } else {
@@ -334,5 +371,4 @@ function runSequencer() {
   }, stepTime);
 }
 
-// Initial View Render on Load
 renderViewport();
