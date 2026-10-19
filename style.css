@@ -1,0 +1,73 @@
+body {
+  background: radial-gradient(circle at top, #151821 0%, #08090c 100%);
+  color: #d1d5db;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+}
+
+.fl-chassis {
+  background: linear-gradient(180deg, #22262f 0%, #171a21 100%);
+  border: 1px solid #333947;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.fl-pad {
+  background: linear-gradient(180deg, #2d3340 0%, #1e222b 100%);
+  border: 1px solid #14161c;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.fl-pad.active-kick {
+  background: linear-gradient(180deg, #00ff66 0%, #00993d 100%) !important;
+  border-color: #00ff66 !important;
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.7), inset 0 1px 1px #fff !important;
+}
+
+.fl-pad.active-snare {
+  background: linear-gradient(180deg, #00d9ff 0%, #0077b3 100%) !important;
+  border-color: #00d9ff !important;
+  box-shadow: 0 0 12px rgba(0, 217, 255, 0.7), inset 0 1px 1px #fff !important;
+}
+
+.fl-pad.active-hat {
+  background: linear-gradient(180deg, #ff0077 0%, #990047 100%) !important;
+  border-color: #ff0077 !important;
+  box-shadow: 0 0 12px rgba(255, 0, 119, 0.7), inset 0 1px 1px #fff !important;
+}
+
+.fl-pad.active-clap {
+  background: linear-gradient(180deg, #ffaa00 0%, #996600 100%) !important;
+  border-color: #ffaa00 !important;
+  box-shadow: 0 0 12px rgba(255, 170, 0, 0.7), inset 0 1px 1px #fff !important;
+}
+
+.step-current {
+  border: 2px solid #ffffff !important;
+  filter: brightness(1.3);
+}
+
+.knob-dial {
+  background: radial-gradient(circle at 35% 35%, #4b5563, #1f2937);
+  border: 1px solid #111827;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.tab-active {
+  background: linear-gradient(180deg, #ff8c00 0%, #cc7000 100%) !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  border-color: #ffaa33 !important;
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+}
+
+.white-key {
+  background: linear-gradient(180deg, #ffffff 0%, #d1d5db 100%);
+  border: 1px solid #9ca3af;
+  color: #111827;
+}
+
+.black-key {
+  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+  border: 1px solid #000;
+  color: #fff;
+}
