@@ -7,20 +7,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background-color: #121418;
+      background-color: #0d0f12;
       color: #d1d5db;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
     }
-    .fl-rack-row {
-      background: linear-gradient(180deg, #252a34 0%, #1a1d24 100%);
-      border: 1px solid #323846;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.5);
+    .fl-chassis {
+      background: linear-gradient(180deg, #22262f 0%, #171a21 100%);
+      border: 1px solid #333947;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.6);
     }
     .fl-pad {
-      background: linear-gradient(180deg, #323846 0%, #222630 100%);
-      border: 1px solid #181a20;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+      background: linear-gradient(180deg, #2d3340 0%, #1e222b 100%);
+      border: 1px solid #14161c;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
     .fl-pad.active-kick {
       background: linear-gradient(180deg, #00ff66 0%, #00993d 100%) !important;
@@ -47,59 +47,167 @@
       filter: brightness(1.3);
     }
     .knob-dial {
-      background: radial-gradient(circle at 30% 30%, #4b5563, #1f2937);
+      background: radial-gradient(circle at 35% 35%, #4b5563, #1f2937);
       border: 1px solid #111827;
       box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.6);
     }
+    .tab-active {
+      background: linear-gradient(180deg, #ff8c00 0%, #cc7000 100%) !important;
+      color: #000000 !important;
+      font-weight: 900 !important;
+      border-color: #ffaa33 !important;
+      box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+    }
+    .white-key {
+      background: linear-gradient(180deg, #ffffff 0%, #d1d5db 100%);
+      border: 1px solid #9ca3af;
+      color: #111827;
+    }
+    .white-key:active { background: #9ca3af; }
+    .black-key {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      border: 1px solid #000;
+      color: #fff;
+    }
+    .black-key:active { background: #374151; }
   </style>
 </head>
 <body class="p-3 max-w-md mx-auto min-h-screen flex flex-col justify-between">
 
   <div>
-    <!-- FL Studio Top Control Bar -->
-    <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl mb-3 flex items-center justify-between shadow-2xl">
+    <!-- FL Top Header Bar -->
+    <div class="fl-chassis p-3 rounded-2xl mb-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-        <span class="text-xs font-black tracking-widest text-white">WAVEX<span class="text-emerald-400"> STUDIO</span></span>
+        <div class="w-3 h-3 rounded-full bg-amber-500 shadow-md shadow-amber-500/50 animate-pulse"></div>
+        <span class="text-xs font-black tracking-widest text-white">WAVEX<span class="text-amber-500"> STUDIO</span></span>
       </div>
-      <button id="playBtn" class="bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs px-5 py-2 rounded-lg shadow-lg shadow-emerald-500/20 active:scale-95 transition">
+      <button id="playBtn" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-black text-xs px-5 py-2 rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition">
         ▶ PLAY
       </button>
     </div>
 
     <!-- FL View Navigation Tabs -->
-    <div class="grid grid-cols-4 gap-1 p-1 bg-zinc-950 border border-zinc-800 rounded-lg mb-3 text-[10px] font-black text-zinc-400">
-      <button class="py-1.5 rounded bg-zinc-800 text-emerald-400 border border-emerald-500/30 text-center">RACK</button>
-      <button class="py-1.5 rounded bg-zinc-900/50 hover:text-white text-center">PIANO</button>
-      <button class="py-1.5 rounded bg-zinc-900/50 hover:text-white text-center">PLAYLIST</button>
-      <button class="py-1.5 rounded bg-zinc-900/50 hover:text-white text-center">MIXER</button>
+    <div class="grid grid-cols-4 gap-1 p-1 bg-black/60 border border-zinc-800 rounded-xl mb-3 text-[10px] font-bold text-zinc-400">
+      <button id="tab-rack" onclick="switchView('rack')" class="py-2 rounded-lg tab-active border border-transparent transition text-center">RACK</button>
+      <button id="tab-piano" onclick="switchView('piano')" class="py-2 rounded-lg hover:text-white border border-transparent transition text-center">PIANO</button>
+      <button id="tab-playlist" onclick="switchView('playlist')" class="py-2 rounded-lg hover:text-white border border-transparent transition text-center">PLAYLIST</button>
+      <button id="tab-mixer" onclick="switchView('mixer')" class="py-2 rounded-lg hover:text-white border border-transparent transition text-center">MIXER</button>
     </div>
 
     <!-- Tempo & Master Controls -->
-    <div class="bg-zinc-900/80 border border-zinc-800 p-2.5 rounded-xl flex items-center justify-between gap-3 mb-4">
-      <div class="flex items-center gap-2 bg-black/60 px-3 py-1 rounded-lg border border-zinc-800">
-        <span class="text-[10px] font-bold text-zinc-500">TEMPO</span>
-        <input id="bpmInput" type="number" value="125" class="bg-transparent text-emerald-400 font-bold w-10 text-center text-xs focus:outline-none">
+    <div class="fl-chassis p-2.5 rounded-2xl flex items-center justify-between gap-3 mb-4">
+      <div class="flex items-center gap-2 bg-black/60 px-3 py-1.5 rounded-xl border border-zinc-800">
+        <span class="text-[10px] font-extrabold text-zinc-400">TEMPO</span>
+        <input id="bpmInput" type="number" value="125" class="bg-transparent text-amber-500 font-black w-10 text-center text-xs focus:outline-none">
         <span class="text-[9px] text-zinc-500 font-bold">BPM</span>
       </div>
       <div class="flex items-center gap-2 flex-1">
-        <span class="text-[10px] font-bold text-zinc-500">MASTER</span>
-        <input id="volInput" type="range" min="0" max="1" step="0.05" value="0.8" class="w-full accent-emerald-400 h-1 bg-zinc-800 rounded-lg">
+        <span class="text-[10px] font-extrabold text-zinc-400">MASTER</span>
+        <input id="volInput" type="range" min="0" max="1" step="0.05" value="0.8" class="w-full accent-amber-500 h-1.5 bg-zinc-800 rounded-lg">
       </div>
     </div>
 
-    <!-- Channel Rack Section -->
-    <div class="flex justify-between items-center mb-2 px-1">
-      <span class="text-[10px] font-black tracking-widest text-zinc-400">CHANNEL RACK</span>
-      <span class="text-[9px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded-full">8 STEP SEQUENCER</span>
+    <!-- ================= VIEW 1: CHANNEL RACK ================= -->
+    <div id="view-rack">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-[10px] font-black tracking-widest text-zinc-400">CHANNEL RACK</span>
+        <span class="text-[9px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">8 STEPS</span>
+      </div>
+      <div id="rack-container" class="space-y-2"></div>
     </div>
 
-    <!-- Rack Rows -->
-    <div id="rack" class="space-y-2"></div>
+    <!-- ================= VIEW 2: PIANO ROLL ================= -->
+    <div id="view-piano" class="hidden">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-[10px] font-black tracking-widest text-zinc-400">PIANO ROLL SYNTH</span>
+        <span class="text-[9px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-full">SYNTH LEAD</span>
+      </div>
+      <div class="fl-chassis p-3 rounded-2xl">
+        <div class="h-28 bg-black/60 rounded-xl border border-zinc-800 mb-3 p-2 relative flex items-center justify-center">
+          <span class="text-xs text-zinc-600 font-bold">Tap keys below to play lead melody</span>
+        </div>
+        <div class="grid grid-cols-7 gap-1 h-28">
+          <button onclick="playPianoFreq(261.63)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">C</button>
+          <button onclick="playPianoFreq(293.66)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">D</button>
+          <button onclick="playPianoFreq(329.63)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">E</button>
+          <button onclick="playPianoFreq(349.23)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">F</button>
+          <button onclick="playPianoFreq(392.00)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">G</button>
+          <button onclick="playPianoFreq(440.00)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">A</button>
+          <button onclick="playPianoFreq(493.88)" class="white-key rounded-b-lg font-black text-xs pb-2 flex items-end justify-center">B</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 3: PLAYLIST ARRANGER ================= -->
+    <div id="view-playlist" class="hidden">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-[10px] font-black tracking-widest text-zinc-400">PLAYLIST / SONG ARRANGER</span>
+        <span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">BARS 1-8</span>
+      </div>
+      <div class="fl-chassis p-3 rounded-2xl space-y-2">
+        <div class="p-2 bg-black/40 rounded-xl border border-zinc-800">
+          <span class="text-[10px] font-bold text-amber-500 block mb-1">Track 1: Drums Beat</span>
+          <div class="grid grid-cols-4 gap-1">
+            <div class="h-7 bg-emerald-500/30 border border-emerald-500/50 rounded flex items-center justify-center text-[9px] font-bold text-emerald-300">Pat 1</div>
+            <div class="h-7 bg-emerald-500/30 border border-emerald-500/50 rounded flex items-center justify-center text-[9px] font-bold text-emerald-300">Pat 1</div>
+            <div class="h-7 bg-emerald-500/30 border border-emerald-500/50 rounded flex items-center justify-center text-[9px] font-bold text-emerald-300">Pat 1</div>
+            <div class="h-7 bg-zinc-800/50 border border-zinc-800 rounded"></div>
+          </div>
+        </div>
+        <div class="p-2 bg-black/40 rounded-xl border border-zinc-800">
+          <span class="text-[10px] font-bold text-cyan-400 block mb-1">Track 2: Synth Melody</span>
+          <div class="grid grid-cols-4 gap-1">
+            <div class="h-7 bg-zinc-800/50 border border-zinc-800 rounded"></div>
+            <div class="h-7 bg-cyan-500/30 border border-cyan-500/50 rounded flex items-center justify-center text-[9px] font-bold text-cyan-300">Pat 2</div>
+            <div class="h-7 bg-cyan-500/30 border border-cyan-500/50 rounded flex items-center justify-center text-[9px] font-bold text-cyan-300">Pat 2</div>
+            <div class="h-7 bg-cyan-500/30 border border-cyan-500/50 rounded flex items-center justify-center text-[9px] font-bold text-cyan-300">Pat 2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 4: MIXER BOARD ================= -->
+    <div id="view-mixer" class="hidden">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-[10px] font-black tracking-widest text-zinc-400">MIXER CONSOLE</span>
+        <span class="text-[9px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full">4 CHANNELS</span>
+      </div>
+      <div class="fl-chassis p-3 rounded-2xl grid grid-cols-4 gap-2 text-center">
+        <div class="p-2 bg-black/40 rounded-xl border border-zinc-800 flex flex-col items-center">
+          <span class="text-[9px] font-bold text-amber-500 mb-1">MASTER</span>
+          <div class="w-2 bg-zinc-800 h-20 rounded-full relative overflow-hidden my-1">
+            <div class="w-full bg-emerald-400 absolute bottom-0 h-3/4"></div>
+          </div>
+          <span class="text-[8px] text-zinc-500 font-bold">0 dB</span>
+        </div>
+        <div class="p-2 bg-black/40 rounded-xl border border-zinc-800 flex flex-col items-center">
+          <span class="text-[9px] font-bold text-emerald-400 mb-1">KICK</span>
+          <div class="w-2 bg-zinc-800 h-20 rounded-full relative overflow-hidden my-1">
+            <div class="w-full bg-emerald-400 absolute bottom-0 h-2/3"></div>
+          </div>
+          <span class="text-[8px] text-zinc-500 font-bold">-2 dB</span>
+        </div>
+        <div class="p-2 bg-black/40 rounded-xl border border-zinc-800 flex flex-col items-center">
+          <span class="text-[9px] font-bold text-cyan-400 mb-1">SNARE</span>
+          <div class="w-2 bg-zinc-800 h-20 rounded-full relative overflow-hidden my-1">
+            <div class="w-full bg-cyan-400 absolute bottom-0 h-1/2"></div>
+          </div>
+          <span class="text-[8px] text-zinc-500 font-bold">-4 dB</span>
+        </div>
+        <div class="p-2 bg-black/40 rounded-xl border border-zinc-800 flex flex-col items-center">
+          <span class="text-[9px] font-bold text-pink-400 mb-1">HAT</span>
+          <div class="w-2 bg-zinc-800 h-20 rounded-full relative overflow-hidden my-1">
+            <div class="w-full bg-pink-400 absolute bottom-0 h-3/5"></div>
+          </div>
+          <span class="text-[8px] text-zinc-500 font-bold">-3 dB</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="text-center text-[10px] text-zinc-600 font-semibold my-3">
-    WAVEX-STUDIO • Authentic Sound Engine
+  <div class="text-center text-[10px] text-zinc-600 font-bold my-3">
+    WAVEX-STUDIO • Professional FL DAW Engine
   </div>
 
   <script>
@@ -123,14 +231,41 @@
       if (ctx.state === 'suspended') ctx.resume();
     }
 
-    // Authentic Synthesis Engine
+    function switchView(viewName) {
+      ['rack', 'piano', 'playlist', 'mixer'].forEach(v => {
+        document.getElementById(`view-${v}`).classList.add('hidden');
+        document.getElementById(`tab-${v}`).classList.remove('tab-active');
+      });
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      document.getElementById(`tab-${viewName}`).classList.add('tab-active');
+    }
+
+    function playPianoFreq(freq) {
+      initCtx();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const masterVol = parseFloat(document.getElementById('volInput').value);
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+      gain.gain.setValueAtTime(masterVol * 0.7, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    }
+
     function playSound(type) {
       if (!ctx) return;
       const masterVol = parseFloat(document.getElementById('volInput').value);
       const now = ctx.currentTime;
 
       if (type === 'kick') {
-        // Kick Pitch Sweep
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.frequency.setValueAtTime(150, now);
@@ -143,7 +278,6 @@
         osc.stop(now + 0.25);
       } 
       else if (type === 'snare') {
-        // Snare Noise + Body Oscillator
         const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
         for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
@@ -179,7 +313,6 @@
         osc.stop(now + 0.1);
       } 
       else if (type === 'hat') {
-        // Metallic High-Pass Noise Burst
         const bufferSize = ctx.sampleRate * 0.05;
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -202,7 +335,6 @@
         source.start(now);
       } 
       else if (type === 'clap') {
-        // Multi-Burst Echo Clap
         const bufferSize = ctx.sampleRate * 0.12;
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -227,14 +359,13 @@
     }
 
     function renderRack() {
-      const rackEl = document.getElementById('rack');
+      const rackEl = document.getElementById('rack-container');
       rackEl.innerHTML = '';
 
       tracks.forEach((track, tIdx) => {
         const row = document.createElement('div');
-        row.className = 'fl-rack-row p-2 rounded-xl flex items-center justify-between gap-2';
+        row.className = 'fl-chassis p-2 rounded-xl flex items-center justify-between gap-2';
 
-        // Track Name & Channel Knobs
         const trackMeta = document.createElement('div');
         trackMeta.className = 'w-24 flex items-center gap-1.5';
         trackMeta.innerHTML = `
@@ -251,7 +382,6 @@
         `;
         row.appendChild(trackMeta);
 
-        // 8 Steps Grid
         const grid = document.createElement('div');
         grid.className = 'grid grid-cols-8 gap-1 flex-1';
 
@@ -283,12 +413,12 @@
 
       if (isPlaying) {
         playBtn.innerText = '■ STOP';
-        playBtn.className = 'bg-rose-500 hover:bg-rose-600 text-white font-black text-xs px-5 py-2 rounded-lg shadow-lg shadow-rose-500/20 active:scale-95 transition';
+        playBtn.className = 'bg-rose-500 hover:bg-rose-600 text-white font-black text-xs px-5 py-2 rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 transition';
         currentStep = 0;
         runSequencer();
       } else {
         playBtn.innerText = '▶ PLAY';
-        playBtn.className = 'bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs px-5 py-2 rounded-lg shadow-lg shadow-emerald-500/20 active:scale-95 transition';
+        playBtn.className = 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-black text-xs px-5 py-2 rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition';
         clearInterval(intervalId);
         renderRack();
       }
