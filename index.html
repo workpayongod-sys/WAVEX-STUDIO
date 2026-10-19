@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,47 +6,99 @@
   <title>WAVEX-STUDIO</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #121212; color: #FFFFFF; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
-    .active-step { background-color: #00FF66 !important; box-shadow: 0 0 10px #00FF66; }
-    .current-step { border: 2px solid #FFFFFF !important; }
+    body {
+      background: radial-gradient(circle at top, #1a1e29 0%, #0a0c10 100%);
+      color: #e4e4e7;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+    .glass-panel {
+      background: rgba(22, 27, 38, 0.65);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    }
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .step-active-kick {
+      background: linear-gradient(135deg, #00ff88, #00b862) !important;
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      border-color: #00ff88 !important;
+    }
+    .step-active-snare {
+      background: linear-gradient(135deg, #00d9ff, #0088cc) !important;
+      box-shadow: 0 0 12px rgba(0, 217, 255, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      border-color: #00d9ff !important;
+    }
+    .step-active-hat {
+      background: linear-gradient(135deg, #ff0077, #b80055) !important;
+      box-shadow: 0 0 12px rgba(255, 0, 119, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      border-color: #ff0077 !important;
+    }
+    .step-active-clap {
+      background: linear-gradient(135deg, #ffaa00, #cc7700) !important;
+      box-shadow: 0 0 12px rgba(255, 170, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      border-color: #ffaa00 !important;
+    }
+    .step-current {
+      border: 2px solid #ffffff !important;
+      transform: scale(1.05);
+    }
   </style>
 </head>
-<body class="p-4 max-w-md mx-auto min-h-screen flex flex-col justify-between">
+<body class="p-3 max-w-lg mx-auto min-h-screen flex flex-col justify-between">
 
-  <!-- Header & Transport -->
   <div>
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-xl font-extrabold tracking-wider text-emerald-400">WAVEX-STUDIO</h1>
-      <button id="playBtn" class="bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-6 py-2 rounded-lg transition">
-        PLAY
-      </button>
+    <!-- Top Header Bar -->
+    <div class="glass-panel p-3 rounded-2xl flex justify-between items-center mb-4">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+        <h1 class="text-sm font-black tracking-widest text-white">WAVEX<span class="text-emerald-400">-STUDIO</span></h1>
+      </div>
+      <div class="flex gap-2">
+        <button id="playBtn" class="bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-extrabold text-xs px-5 py-2 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition">
+          ▶ PLAY
+        </button>
+      </div>
     </div>
 
-    <!-- Controls Bar -->
-    <div class="bg-zinc-900 p-4 rounded-xl flex items-center justify-between gap-4 mb-6 border border-zinc-800">
-      <div class="flex items-center gap-2">
-        <span class="text-xs text-zinc-400 font-semibold">BPM</span>
-        <input id="bpmInput" type="number" value="125" class="bg-zinc-800 text-emerald-400 font-bold w-16 text-center py-1 rounded border border-zinc-700">
+    <!-- Mode Switcher Tabs -->
+    <div class="grid grid-cols-4 gap-1.5 p-1 glass-panel rounded-xl mb-4 text-[10px] font-bold tracking-wider text-zinc-400">
+      <button class="py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-center">RACK</button>
+      <button class="py-1.5 rounded-lg glass-btn hover:text-white text-center">PIANO</button>
+      <button class="py-1.5 rounded-lg glass-btn hover:text-white text-center">PLAYLIST</button>
+      <button class="py-1.5 rounded-lg glass-btn hover:text-white text-center">MIXER</button>
+    </div>
+
+    <!-- Master Controls Panel -->
+    <div class="glass-panel p-3.5 rounded-2xl flex items-center justify-between gap-3 mb-4">
+      <div class="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5">
+        <span class="text-[10px] font-bold text-zinc-400">BPM</span>
+        <input id="bpmInput" type="number" value="125" class="bg-transparent text-emerald-400 font-extrabold w-10 text-center text-xs focus:outline-none">
       </div>
-      <div class="flex items-center gap-2 flex-1 max-w-[150px]">
-        <span class="text-xs text-zinc-400 font-semibold">VOL</span>
-        <input id="volInput" type="range" min="0" max="1" step="0.1" value="0.8" class="w-full accent-emerald-400">
+      <div class="flex items-center gap-2 flex-1">
+        <span class="text-[10px] font-bold text-zinc-400">VOL</span>
+        <input id="volInput" type="range" min="0" max="1" step="0.05" value="0.8" class="w-full accent-emerald-400 h-1.5 bg-zinc-800 rounded-lg">
       </div>
     </div>
 
     <!-- Channel Rack Header -->
-    <div class="flex justify-between items-center mb-3">
-      <span class="text-xs font-bold tracking-widest text-zinc-400">CHANNEL RACK</span>
-      <span class="text-xs text-emerald-400">16 STEPS</span>
+    <div class="flex justify-between items-center mb-2.5 px-1">
+      <span class="text-[11px] font-extrabold tracking-widest text-zinc-400">CHANNEL RACK</span>
+      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">8 STEPS</span>
     </div>
 
-    <!-- Sequencer Tracks Container -->
-    <div id="rack" class="space-y-3"></div>
+    <!-- Rack Container -->
+    <div id="rack" class="space-y-2.5"></div>
   </div>
 
-  <!-- Footer Info -->
-  <div class="text-center text-xs text-zinc-600 mt-6">
-    WAVEX-STUDIO • Zero Friction Web DAW Engine
+  <!-- Footer -->
+  <div class="text-center text-[10px] text-zinc-500 font-medium my-4">
+    WAVEX-STUDIO • Native Web Audio Engine
   </div>
 
   <script>
@@ -58,37 +109,36 @@
     let intervalId = null;
 
     const tracks = [
-      { name: "Kick", freq: 150, decay: 0.2, type: "sine" },
-      { name: "Snare", freq: 250, decay: 0.15, type: "triangle" },
-      { name: "Hi-Hat", freq: 800, decay: 0.05, type: "square" },
-      { name: "Clap", freq: 400, decay: 0.1, type: "sawtooth" }
+      { name: "Kick", freq: 140, decay: 0.22, type: "sine", activeClass: "step-active-kick", color: "text-emerald-400" },
+      { name: "Snare", freq: 240, decay: 0.16, type: "triangle", activeClass: "step-active-snare", color: "text-cyan-400" },
+      { name: "Hi-Hat", freq: 850, decay: 0.05, type: "square", activeClass: "step-active-hat", color: "text-pink-400" },
+      { name: "Clap", freq: 420, decay: 0.11, type: "sawtooth", activeClass: "step-active-clap", color: "text-amber-400" }
     ];
 
-    const sequence = tracks.map(() => Array(16).fill(false));
+    const sequence = tracks.map(() => Array(8).fill(false));
 
     function initCtx() {
       if (!ctx) ctx = new AudioCtx();
       if (ctx.state === 'suspended') ctx.resume();
     }
 
-    function playSound(trackIdx) {
+    function playSound(tIdx) {
       if (!ctx) return;
-      const track = tracks[trackIdx];
+      const track = tracks[tIdx];
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
       const masterVol = parseFloat(document.getElementById('volInput').value);
-      
+
       osc.type = track.type;
       osc.frequency.setValueAtTime(track.freq, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + track.decay);
-      
+
       gain.gain.setValueAtTime(masterVol, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + track.decay);
-      
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      
+
       osc.start();
       osc.stop(ctx.currentTime + track.decay);
     }
@@ -99,30 +149,43 @@
 
       tracks.forEach((track, tIdx) => {
         const row = document.createElement('div');
-        row.className = 'bg-zinc-900 p-3 rounded-lg border border-zinc-800/80';
-        
-        const title = document.createElement('div');
-        title.className = 'text-xs font-bold text-zinc-300 mb-2';
-        title.innerText = track.name;
-        row.appendChild(title);
+        row.className = 'glass-panel p-2.5 rounded-2xl flex flex-col gap-2';
 
-        const stepsGrid = document.createElement('div');
-        stepsGrid.className = 'grid grid-cols-8 gap-1.5';
+        const meta = document.createElement('div');
+        meta.className = 'flex justify-between items-center';
+        
+        const title = document.createElement('span');
+        title.className = `text-xs font-black tracking-wide ${track.color}`;
+        title.innerText = track.name;
+
+        const knobContainer = document.createElement('div');
+        knobContainer.className = 'flex gap-2 text-[9px] text-zinc-400 font-bold';
+        knobContainer.innerHTML = `<span>VOL</span><span>PAN</span>`;
+
+        meta.appendChild(title);
+        meta.appendChild(knobContainer);
+        row.appendChild(meta);
+
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-8 gap-1.5';
 
         for (let sIdx = 0; sIdx < 8; sIdx++) {
           const btn = document.createElement('button');
-          btn.className = `h-9 rounded border border-zinc-700 transition ${sequence[tIdx][sIdx] ? 'active-step' : 'bg-zinc-800'}`;
-          if (currentStep === sIdx && isPlaying) btn.classList.add('current-step');
+          btn.className = `h-10 rounded-xl transition-all duration-150 border border-white/5 ${sequence[tIdx][sIdx] ? track.activeClass : 'bg-black/40 hover:bg-black/60'}`;
           
+          if (currentStep === sIdx && isPlaying) {
+            btn.classList.add('step-current');
+          }
+
           btn.onclick = () => {
             initCtx();
             sequence[tIdx][sIdx] = !sequence[tIdx][sIdx];
             if (sequence[tIdx][sIdx]) playSound(tIdx);
             renderRack();
           };
-          stepsGrid.appendChild(btn);
+          grid.appendChild(btn);
         }
-        row.appendChild(stepsGrid);
+        row.appendChild(grid);
         rackEl.appendChild(row);
       });
     }
@@ -133,13 +196,13 @@
       const playBtn = document.getElementById('playBtn');
 
       if (isPlaying) {
-        playBtn.innerText = 'STOP';
-        playBtn.className = 'bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-2 rounded-lg transition';
+        playBtn.innerText = '■ STOP';
+        playBtn.className = 'bg-gradient-to-r from-rose-500 to-red-600 text-white font-extrabold text-xs px-5 py-2 rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 transition';
         currentStep = 0;
         runSequencer();
       } else {
-        playBtn.innerText = 'PLAY';
-        playBtn.className = 'bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-6 py-2 rounded-lg transition';
+        playBtn.innerText = '▶ PLAY';
+        playBtn.className = 'bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-extrabold text-xs px-5 py-2 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition';
         clearInterval(intervalId);
         renderRack();
       }
